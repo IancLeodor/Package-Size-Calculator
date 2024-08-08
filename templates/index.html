@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculare Cubaj Volumetric</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Calculare Cubaj Volumetric al Coletului</h1>
+        <button id="start-camera">Pornește Camera</button>
+        <select id="camera-select">
+            <option value="">Selectează camera</option>
+        </select>
+        <button id="capture" disabled>Capturează</button>
+        <a href="{{ url_for('history') }}" class="btn">Vezi Istoric</a>
+        <video id="camera-stream" autoplay playsinline style="display: none;"></video>
+        <div id="result"></div>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
