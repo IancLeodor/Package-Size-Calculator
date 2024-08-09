@@ -5,13 +5,11 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 import datetime
 
-# Generare cheie privată
 private_key = rsa.generate_private_key(
     public_exponent=65537,
     key_size=2048,
 )
 
-# Crearea unui certificat self-signed
 subject = issuer = x509.Name([
     x509.NameAttribute(NameOID.COUNTRY_NAME, u"RO"),
     x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Romania"),
@@ -37,7 +35,6 @@ cert = x509.CertificateBuilder().subject_name(
     critical=False,
 ).sign(private_key, hashes.SHA256())
 
-# Scriere cheie privată
 with open("key.pem", "wb") as f:
     f.write(private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
@@ -45,7 +42,6 @@ with open("key.pem", "wb") as f:
         encryption_algorithm=serialization.NoEncryption(),
     ))
 
-# Scriere certificat
 with open("cert.pem", "wb") as f:
     f.write(cert.public_bytes(serialization.Encoding.PEM))
 

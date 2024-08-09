@@ -53,7 +53,6 @@ def process_image_route():
         if result is None:
             return jsonify({'error': 'Object could not be detected in the image'}), 400
 
-        # Convert NumPy types to standard Python types
         serializable_result = {
             'dimensions': {
                 'length': float(result['length']),
@@ -87,6 +86,3 @@ def history():
     results = Result.query.order_by(Result.created_at.desc()).all()
     return render_template('history.html', results=results)
 
-@app.route('/camera_test')
-def camera_test():
-    return send_file('test_cam.html')

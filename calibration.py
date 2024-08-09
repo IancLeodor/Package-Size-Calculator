@@ -1,102 +1,45 @@
-import sys
 import requests
 import base64
-import socket
+import sys
+import logging
 
-def get_local_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        s.connect(('10.254.254.254', 1))
-        local_ip = s.getsockname()[0]
-    except Exception:
-        local_ip = '127.0.0.1'
-    finally:
-        s.close()
-    return local_ip
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def perform_calibration(image_path, known_width_cm, server_url):
-    with open(image_path, 'rb') as image_file:
-        image_data = base64.b64encode(image_file.read()).decode('utf-8')
+    try:
+        with open(image_path, 'rb') as image_file:
+            image_data = base64.b64encode(image_file.read()).decode('utf-8')
 
-    data = {
-        'image': f'data:image/jpeg;base64,{image_data}',
-        'known_width_cm': known_width_cm
-    }
+        data = {
+            'image': f'data:image/jpeg;base64,{image_data}',
+            'known_width_cm': known_width_cm
+        }
 
-    response = requests.post(f'{server_url}/calibrate', json=data, verify=False)
+        response = requests.post(f'{server_url}/calibrate', json=data, verify=False)
 
-    if response.status_code == 200:
-        calibration_data = response.json()
-        print("Calibration successful:", calibration_data)
-        return calibration_data
-    else:
-        print("Calibration failed:", response.json())
+        if response.status_code == 200:
+            calibration_data = response.json()
+            logger.info("Calibration successful: %s", calibration_data)
+            return calibration_data
+        else:
+            logger.error("Calibration failed: %s", response.json())
+            return None
+    except Exception as e:
+        logger.exception("An error occurred during calibration: %s", e)
         return None
 
 if __name__ == "__main__":
-    local_ip = get_local_ip()
-    server_url = f'https://{local_ip}:5000'
-    result = perform_calibration('C:/Users/leodo/Desktop/cube_calculator/calibration.jpeg', 9.56, server_url)
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Perform calibration")
+    parser.add_argument('--image_path', type=str, required=True, help="Path to the calibration image")
+    parser.add_argument('--known_width_cm', type=float, required=True, help="Known width of the object in cm")
+    parser.add_argument('--server_url', type=str, required=True, help="URL of the server for calibration")
+    args = parser.parse_args()
+
+    result = perform_calibration(args.image_path, args.known_width_cm, args.server_url)
     if result:
         sys.exit(0)
     else:
         sys.exit(1)
-
-
-
-
-# import requests
-# import base64
-# import sys
-
-# def perform_calibration(image_path, known_width_cm, server_url):
-#     with open(image_path, 'rb') as image_file:
-#         image_data = base64.b64encode(image_file.read()).decode('utf-8')
-
-#     data = {
-#         'image': f'data:image/jpeg;base64,{image_data}',
-#         'known_width_cm': known_width_cm
-#     }
-
-#     response = requests.post(f'{server_url}/calibrate', json=data, verify=False)
-
-#     if response.status_code == 200:
-#         calibration_data = response.json()
-#         print("Calibration successful:", calibration_data)
-#         return calibration_data
-#     else:
-#         print("Calibration failed:", response.json())
-#         return None
-
-# if __name__ == "__main__":
-#     result = perform_calibration('C:/Users/leodo/Desktop/cube_calculator/calibration.jpeg', 8.56, 'https://192.168.1.103:5000')
-#     if result:
-#         sys.exit(0)
-#     else:
-#         sys.exit(1)
-
-
-# import requests
-# import base64
-# import sys
-
-
-# # Use raw string to handle backslashes in the file path
-# with open(r'C:\Users\leodo\Desktop\cube_calculator\calibration9.jpeg', 'rb') as image_file:
-#     image_data = base64.b64encode(image_file.read()).decode('utf-8')
-
-# known_width_cm = 9.56
-
-# data = {
-#     'image': f'data:image/jpeg;base64,{image_data}',
-#     'known_width_cm': known_width_cm
-# }
-
-# # Send the POST request to the calibration endpoint with SSL verification disabled
-# response = requests.post('https://192.168.1.103:5000/calibrate', json=data, verify=False)
-
-# if response.status_code == 200:
-#     calibration_data = response.json()
-#     print("Calibration successful:", calibration_data)
-# else:
-#     print("Calibration failed:", response.json())

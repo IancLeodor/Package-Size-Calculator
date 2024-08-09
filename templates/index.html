@@ -15,7 +15,7 @@
         </select>
         <button id="capture" disabled>Capturează</button>
         <a href="{{ url_for('history') }}" class="btn">Vezi Istoric</a>
-        <video id="camera-stream" autoplay playsinline style="display: none;"></video>
+        <video id="camera-stream" autoplay playsinline></video>
         <div id="result"></div>
     </div>
     <script src="{{ url_for('static', filename='app.js') }}"></script>
